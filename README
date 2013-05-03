@@ -1,0 +1,26 @@
+
+-------------------------------------------------------------------
+booj player - control something that has music and a way to play it
+-------------------------------------------------------------------
+
+Quickstart: execute the following line
+
+    PYTHONPATH=. python booj/controller.py booj.db
+
+What booj player is
+-------------------
+Somebody's first web application that attempts to let a user control music
+on their computer from a phone, tablet or other mobile device.
+
+Built using cherrypy (www.cherrypy.org) and jQuery Mobile (jquerymobile.com)
+
+What booj player is not
+-----------------------
+A streaming music server.  All the music you want to play is expected to
+live on the device that is playing it/hosting booj.  The original idea
+was to run on a Raspberry Pi (www.raspberrypi.org) connected to an amplifier.
+
+derek.spadaro@gmail.com
+
+Please don't write saying how crappy of a web app this is; it is my first
+one and I am an embedded systems person.

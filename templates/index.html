@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/">
+  <head> 
+    <meta name="viewport" content="width=device-width, initial-scale=1"></meta> 
+    <title>Music Demo</title> 
+    <link rel="stylesheet" href="${url('/media/jquery.mobile-1.3.1.css')}" type="text/css" />
+    <script type="text/javascript" src="${url('/media/jquery-1.9.1.js')}"></script>
+    <script type="text/javascript" src="${url('/media/jquery.mobile-1.3.1.js')}"></script>
+    <style media="screen" type="text/css">
+
+input.ui-slider-input {display: none;}
+.center-wrapper{
+    text-align: center;
+}
+.center-wrapper * {
+    margin: 0 auto;
+}
+
+    </style>
+  </head> 
+
+  <body> 
+    <div data-role="page">
+      <div data-role="header">
+        <h1>BoojPlayer</h1>
+      </div><!-- /header -->
+  
+      <div data-role="content">   
+        <p>Play Da Music!</p>
+        <ul data-role="listview" data-inset="true" data-filter="true">
+          <li py:for="artist in artists">     
+            <a href="#">${artist}</a>
+          </li>
+        </ul>
+      </div>
+  
+      <div data-role="footer" data-position="fixed">
+        <h1>Now Playing</h1>
+        <div class="center-wrapper">
+          <div data-role="controlgroup" data-type="horizontal">
+            <a href="landing.html" data-role="button" data-icon="back">Prev</a>
+            <a href="landing.html" data-role="button" data-icon="arrow-r">Play</a>
+            <a href="landing.html" data-role="button" data-icon="forward">Next</a>
+          </div>
+  
+          <form>
+            <label for="slider-0" class="ui-hidden-accessible">Input slider:</label>
+            <input type="range" name="slider" id="slider-0" value="25" min="0" max="100" data-mini="true" />
+          </form>
+        </div><!-- align center -->
+      </div><!-- /header -->
+    </div><!-- /page -->
+  </body>
+</html>
