@@ -22,16 +22,17 @@ input.ui-slider-input {display: none;}
   </head> 
 
   <body> 
-    <div data-role="page">
+    <div data-role="page" data-add-back-btn="true">
       <div data-role="header">
         <h1>BoojPlayer</h1>
+        <a href="${url('/index/')}" data-icon="home" class="ui-btn-right">Home</a>
       </div><!-- /header -->
   
       <div data-role="content">   
-        <p>Play Da Music!</p>
+        <p>Music of Artist</p>
         <ul data-role="listview" data-inset="true" data-filter="true">
-          <li py:for="artist in artists"> 
-            <a href="${url('/artist/%s/' % artists.index(artist))}">${artist}</a>
+          <li py:for="song in songs">     
+            <a href="${url('/song/%s/' % songs.index(song))}">${song}</a>
           </li>
         </ul>
       </div>

@@ -22,21 +22,27 @@ input.ui-slider-input {display: none;}
   </head> 
 
   <body> 
-    <div data-role="page">
-      <div data-role="header">
-        <h1>BoojPlayer</h1>
+    <div data-role="page" data-add-back-btn="true">
+      <div data-role="header" data-position="fixed">
+        <h1>Artist - Song</h1>
+        <a href="${url('/index/')}" data-icon="home" class="ui-btn-right">Home</a>
       </div><!-- /header -->
-  
-      <div data-role="content">   
-        <p>Play Da Music!</p>
-        <ul data-role="listview" data-inset="true" data-filter="true">
-          <li py:for="artist in artists"> 
-            <a href="${url('/artist/%s/' % artists.index(artist))}">${artist}</a>
-          </li>
-        </ul>
+
+      <div class="center-wrapper">
+        <p>&nbsp;</p>
+        <a href="#" data-role="button" data-inline="true">Play</a> 
+        <p>&nbsp;</p>
+      </div>
+      <div class="center-wrapper">
+        <a href="#" data-role="button" data-inline="true">Append to Current Playlist</a> 
+        <p>&nbsp;</p>
+      </div>
+      <div class="center-wrapper">
+        <a href="#" data-role="button" data-inline="true">Add to Playlist</a> 
+        <p>&nbsp;</p>
       </div>
   
-     <xi:include href="_controls.html" />
+      <xi:include href="_controls.html" />
     </div><!-- /page -->
   </body>
 </html>

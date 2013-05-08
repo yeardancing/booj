@@ -5,7 +5,7 @@ import operator, os, sys
 import cherrypy
 from booj.lib import template
 
-server_ip = "172.22.76.122"
+server_ip = "192.168.1.6"
 
 class Root(object):
 
@@ -15,33 +15,37 @@ class Root(object):
     @cherrypy.expose
     @template.output('index.html')
     def index(self):
-        artists = self.data
+        artists = self.data[0]
         return template.render(artists=artists)
+
+    @cherrypy.expose
+    @template.output('artist.html')
+    def artist(self, id):
+        songs = self.data[1]
+        return template.render(songs=songs)
+
+    @cherrypy.expose
+    @template.output('song.html')
+    def song(self, id):
+        return template.render()
 
 def main(database):
     # do database opening and parsing stuff here
     #if os.path.exists(database):
         # ...
     #else:
-    """
-    <a href="#">A Tribe Called Quest</a></li>
-    <a href="#">Guttermouth</a></li>
-    <a href="#">Iggy Popp</a></li>
-    <a href="#">Led Zeppelin</a></li>
-    <a href="#">Moby</a></li>
-    <a href="#">Primus</a></li>
-    <a href="#">Rancid</a></li>
-    <a href="#">Ricky Martin</a></li>
-    <a href="#">Boy Sets Fire</a></li>
-    <a href="#">Save Ferris</a></li>
-    <a href="#">Noby</a></li>
-    <a href="#">Limus</a></li>
-    <a href="#">Aancid</a></li>
-    <a href="#">Ticky Martin</a></li>
-    <a href="#">Woy Sets Fire</a></li>
-    <a href="#">Wave Ferris</a></li>
-    """
-    artists = {"The Celltones", "Devo", "Fleet Foxes", "Eric Clapton", "James Brown"}
+    artists = ["The Celltones", 
+                "Devo", 
+                "Fleet Foxes", 
+                "Eric Clapton",
+                "James Brown"]
+    songs = ["Before You Accuse Me", 
+            "Hey Hey Hey", 
+            "Walking Blues", 
+            "Malted Milk", 
+            "Signe",
+            "Tears in Heaven"]
+    data = [artists, songs]
 
     def _save_data():
         databaseobj = open(database, 'wb')
@@ -60,7 +64,7 @@ def main(database):
         'server.socket_host': server_ip
     })
 
-    cherrypy.quickstart(Root(artists), '/', {
+    cherrypy.quickstart(Root(data), '/', {
         '/media': {
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'static'
