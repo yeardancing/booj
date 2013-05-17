@@ -30,7 +30,9 @@ input.ui-slider-input {display: none;}
 
       <div class="center-wrapper">
         <p>&nbsp;</p>
-        <a href="#" data-role="button" data-inline="true">Play</a> 
+        <form id="play" action="${url('/song/%s/' % id)}" method="post">
+          <input type="submit" value="Play" data-inline="true" /> 
+        </form>
         <p>&nbsp;</p>
       </div>
       <div class="center-wrapper">
