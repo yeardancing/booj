@@ -5,7 +5,8 @@ import operator, os, sys
 import cherrypy
 from booj.lib import template
 
-server_ip = "192.168.1.6"
+default_server_ip = "192.168.1.6"
+server_ip = default_server_ip
 
 class Root(object):
 
@@ -72,5 +73,7 @@ def main(database):
     })
 
 if __name__ == '__main__':
+    if len(sys.argv) == 3:
+        server_ip =  sys.argv[2]
     main(sys.argv[1])
 
