@@ -3,14 +3,15 @@
 import operator, os, sys
 
 import cherrypy
-from booj.lib import template
+from booj.lib import template, player
 
 server_ip = "192.168.1.6"
 
 class Root(object):
 
-    def __init__(self, data):
+    def __init__(self, data, player):
         self.data = data
+        self.myplayer = player
 
     @cherrypy.expose
     @template.output('index.html')
@@ -27,7 +28,16 @@ class Root(object):
     @cherrypy.expose
     @template.output('song.html')
     def song(self, id):
-        return template.render()
+        dummyfile = 'file:/home/dspadaro/src/python/cherrypy/half_a_person.ogg'
+        if cherrypy.request.method == 'POST':
+            if self.myplayer.is_playing():
+                self.myplayer.stop()
+            else:
+                self.myplayer.set_location(dummyfile) 
+                self.myplayer.start()
+                self.myplayer.play()
+
+        return template.render(id=id)
 
 def main(database):
     # do database opening and parsing stuff here
@@ -46,9 +56,13 @@ def main(database):
             "Signe",
             "Tears in Heaven"]
     data = [artists, songs]
+    myplayer = player.BoojPlayer(name="boojPlayer")
 
     def _save_data():
-        databaseobj = open(database, 'wb')
+        if myplayer.is_playing():
+            myplayer.stop()
+        myplayer.destroy()
+        #databaseobj = open(database, 'wb')
 
     if hasattr(cherrypy.engine, 'subscribe'):
         cherrypy.engine.subscribe('stop', _save_data)
@@ -64,7 +78,7 @@ def main(database):
         'server.socket_host': server_ip
     })
 
-    cherrypy.quickstart(Root(data), '/', {
+    cherrypy.quickstart(Root(data, myplayer), '/', {
         '/media': {
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'static'

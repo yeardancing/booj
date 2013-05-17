@@ -8,8 +8,10 @@ import gst
 
 class BoojPlayer(threading.Thread):
     def __init__(self, name):
+        print "boojplayer init!"
         threading.Thread.__init__(self)
         self.running = False
+        self.playmode = False
         self.player = gst.element_factory_make("playbin2", "player")
         fakesink = gst.element_factory_make("fakesink", "fakesink")
         self.player.set_property("video-sink", fakesink)
@@ -44,6 +46,7 @@ class BoojPlayer(threading.Thread):
             self.playmode = False
     
     def set_location(self, location):
+        print "setting location to %s" % location
         self.player.set_property('uri', location)
 
     def query_position(self):
@@ -84,18 +87,20 @@ class BoojPlayer(threading.Thread):
 
     def play(self):
         gst.info("playing player")
+        print("playing player")
         self.player.set_state(gst.STATE_PLAYING)
         self.playmode = True
 
     def stop(self):
         self.player.set_state(gst.STATE_NULL)
         gst.info("stopped player")
+        print("stopped player")
 
     def get_state(self, timeout=1):
         return self.player.get_state(timeout=timeout)
 
     def is_playing(self):
-        return self.playing
+        return self.playmode
 
     def destroy(self):
         self.running = False
