@@ -29,13 +29,12 @@ class Root(object):
     @cherrypy.expose
     @template.output('song.html')
     def song(self, id):
-        dummyfile = 'file:/home/dspadaro/src/python/cherrypy/half_a_person.ogg'
+        dummyfile = 'file:/home/dspadaro/src/python/cherrypy/Sine_wave_440.ogg'
         if cherrypy.request.method == 'POST':
             if self.myplayer.is_playing():
                 self.myplayer.stop()
             else:
                 self.myplayer.set_location(dummyfile) 
-                self.myplayer.start()
                 self.myplayer.play()
 
         return template.render(id=id)
@@ -79,6 +78,7 @@ def main(database):
         'server.socket_host': server_ip
     })
 
+    myplayer.start()
     cherrypy.quickstart(Root(data, myplayer), '/', {
         '/media': {
             'tools.staticdir.on': True,

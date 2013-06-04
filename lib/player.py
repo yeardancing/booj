@@ -28,8 +28,7 @@ class BoojPlayer(threading.Thread):
         #context = loop.get_context()
         while 1:
             #handle commands here
-            print "in a loop"
-            time.sleep(2)
+            time.sleep(1)
             if self.running == False:
                 break
             #context.iteration(True)
@@ -94,6 +93,7 @@ class BoojPlayer(threading.Thread):
     def stop(self):
         self.player.set_state(gst.STATE_NULL)
         gst.info("stopped player")
+        self.playmode = False
         print("stopped player")
 
     def get_state(self, timeout=1):
