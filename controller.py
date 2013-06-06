@@ -4,26 +4,27 @@ import operator, os, sys
 
 import cherrypy
 from booj.lib import template, player
+from booj import database
 
-default_server_ip = "192.168.1.6"
+default_server_ip = "192.168.1.5"
 server_ip = default_server_ip
 
 class Root(object):
 
-    def __init__(self, data, player):
-        self.data = data
+    def __init__(self, db, player):
+        self.db = db
         self.myplayer = player
 
     @cherrypy.expose
     @template.output('index.html')
     def index(self):
-        artists = self.data[0]
+        artists = self.db.getArtists()
         return template.render(artists=artists)
 
     @cherrypy.expose
     @template.output('artist.html')
     def artist(self, id):
-        songs = self.data[1]
+        songs = self.db.getSongs(id)
         return template.render(songs=songs)
 
     @cherrypy.expose
@@ -39,23 +40,8 @@ class Root(object):
 
         return template.render(id=id)
 
-def main(database):
-    # do database opening and parsing stuff here
-    #if os.path.exists(database):
-        # ...
-    #else:
-    artists = ["The Celltones", 
-                "Devo", 
-                "Fleet Foxes", 
-                "Eric Clapton",
-                "James Brown"]
-    songs = ["Before You Accuse Me", 
-            "Hey Hey Hey", 
-            "Walking Blues", 
-            "Malted Milk", 
-            "Signe",
-            "Tears in Heaven"]
-    data = [artists, songs]
+def main(db):
+    mydb = database.BoojDb(db)
     myplayer = player.BoojPlayer(name="boojPlayer")
 
     def _save_data():
@@ -79,7 +65,7 @@ def main(database):
     })
 
     myplayer.start()
-    cherrypy.quickstart(Root(data, myplayer), '/', {
+    cherrypy.quickstart(Root(mydb, myplayer), '/', {
         '/media': {
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'static'
