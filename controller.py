@@ -24,7 +24,7 @@ class Root(object):
     @cherrypy.expose
     @template.output('artist.html')
     def artist(self, id):
-        songs = self.db.getSongs(id)
+        songs = self.db.getSongsByArtistId(id)
         return template.render(songs=songs)
 
     @cherrypy.expose
