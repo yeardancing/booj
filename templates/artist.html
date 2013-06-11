@@ -32,7 +32,7 @@ input.ui-slider-input {display: none;}
         <p>Music of Artist</p>
         <ul data-role="listview" data-inset="true" data-filter="true">
           <li py:for="song in songs">     
-            <a href="${url('/song/%s/' % songs.index(song))}">${song}</a>
+            <a href="${url('/song/%s/' % song[1])}">${song[0]}</a>
           </li>
         </ul>
       </div>

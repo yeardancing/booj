@@ -23,13 +23,13 @@ class Root(object):
 
     @cherrypy.expose
     @template.output('artist.html')
-    def artist(self, id):
-        songs = self.db.getSongsByArtistId(id)
+    def artist(self, artistId):
+        songs = self.db.getSongsByArtistId(artistId)
         return template.render(songs=songs)
 
     @cherrypy.expose
     @template.output('song.html')
-    def song(self, id):
+    def song(self, songId):
         dummyfile = 'file:/home/dspadaro/src/python/cherrypy/Sine_wave_440.ogg'
         if cherrypy.request.method == 'POST':
             if self.myplayer.is_playing():
@@ -38,7 +38,7 @@ class Root(object):
                 self.myplayer.set_location(dummyfile) 
                 self.myplayer.play()
 
-        return template.render(id=id)
+        return template.render(songId=songId)
 
 def main(db):
     mydb = database.BoojDb(db)

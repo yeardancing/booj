@@ -8,35 +8,38 @@ class BoojDb():
 
     def getArtists(self):
         conn = sqlite3.connect(self.dbName)
-        conn.text_factory = str
+        #conn.text_factory = str
         cur = conn.cursor()
-        cur.execute('SELECT DISTINCT artist FROM songs')
+        cur.execute('SELECT DISTINCT artist, artistId FROM songs')
         artists = cur.fetchall()
         conn.close()
         return artists
     
     def getSongsByArtistId(self, artistId):
         conn = sqlite3.connect(self.dbName)
-        conn.text_factory = str
+        #conn.text_factory = str
         cur = conn.cursor()
-        cur.execute('SELECT title FROM songs WHERE artistId=?', artistId)
+        print "artistId is", artistId
+        cur.execute('SELECT title, id FROM songs WHERE artistId=?', artistId)
         songs = cur.fetchall()
         conn.close()
+        #print "getSongsByArtistId", artistId
+        #print songs
         return songs
 
     def rebuildDatabase(self, musicRoot):
         conn = sqlite3.connect(self.dbName)
-        conn.text_factory = str
+        #conn.text_factory = str
         cur = conn.cursor()
         sql = "CREATE TABLE IF NOT EXISTS songs\
                 (id INTEGER NOT NULL,\
-                 artist VARCHAR(64) NOT NULL,\
+                 artist TEXT,\
                  artistId INTEGER NOT NULL,\
-                 title VARCHAR(64) NOT NULL,\
-                 album VARCHAR(64) NOT NULL,\
-                 genre VARCHAR(64) NOT NULL,\
+                 title TEXT,\
+                 album TEXT,\
+                 genre TEXT,\
                  year INTEGER NOT NULL,\
-                 filename VARCHAR(64) NOT NULL)"
+                 filename TEXT)"
 
         cur.execute(sql)
         sid = 1
@@ -63,13 +66,13 @@ class BoojDb():
 
                     cur.execute('INSERT INTO songs VALUES(?,?,?,?,?,?,?,?)',
                                (sid, 
-                                artist, 
+                                unicode(artist, 'latin_1'), 
                                 artistId,
-                                id3info['TITLE'],
-                                id3info['ALBUM'],
-                                id3info['GENRE'],
+                                unicode(id3info['TITLE'], 'latin_1'),
+                                unicode(id3info['ALBUM'], 'latin_1'),
+                                unicode(id3info['GENRE'], 'latin_1'),
                                 id3info['YEAR'],    #id3info['TRACKNUMBER']
-                                currfile))
+                                unicode(currfile, 'latin_1')))
                     conn.commit() 
                     sid = sid + 1
         conn.close()

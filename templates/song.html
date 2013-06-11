@@ -12,7 +12,7 @@
     $(function() {
       $("#playnow").click(function() {
         var postdata = { }  // post the form values via ajax
-        $.post("${url('/song/%s/' % id)}", postdata, function(data) {
+        $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
           $('#slider-0').val(0);    // and update controls
           $('#slider-0').slider('refresh');
         });
