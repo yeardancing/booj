@@ -1,108 +1,50 @@
 
-import sys, os, time, thread, threading
-import glib, gobject
-#import pygst
-#pygst.require('0.10')
-import gst
-#import gst.interfaces
+import time 
+import pygame
 
-class BoojPlayer(threading.Thread):
-    def __init__(self, name):
+class BoojPlayer:
+    def __init__(self):
         print "boojplayer init!"
-        threading.Thread.__init__(self)
-        self.running = False
-        self.playmode = False
-        self.player = gst.element_factory_make("playbin2", "player")
-        fakesink = gst.element_factory_make("fakesink", "fakesink")
-        self.player.set_property("video-sink", fakesink)
-        self.on_eos = False
+        pygame.mixer.init()
+        self.volume = pygame.mixer.music.get_volume()
+        self.playing = False
 
-        bus = self.player.get_bus()
-        bus.add_signal_watch()
-        bus.connect("message", self.on_message)
-
-    def run(self):
-        self.running = True
-        loop = gobject.MainLoop()
-        gobject.threads_init()
-        #context = loop.get_context()
-        while 1:
-            #handle commands here
-            time.sleep(1)
-            if self.running == False:
-                break
-            #context.iteration(True)
-
-    def on_message(self, bus, message):
-        t = message.type
-        if t == gst.MESSAGE_EOS:
-            self.player.set_state(gst.STATE_NULL)
-            self.playmode = False
-        elif t == gst.MESSAGE_ERROR:
-            self.player.set_state(gst.STATE_NULL)
-            err, debug = message.parse_error()
-            print "Error: %s" % err, debug
-            self.playmode = False
-    
     def set_location(self, location):
         print "setting location to %s" % location
-        self.player.set_property('uri', location)
+        pygame.mixer.music.load(location)
+        # volume is reset when new music is loaded
+        pygame.mixer.music.set_volume(self.volume)
 
     def query_position(self):
-        "Returns a (position, duration) tuple"
-        try:
-            position, format = self.player.query_position(gst.FORMAT_TIME)
-        except:
-            position = gst.CLOCK_TIME_NONE
-
-        try:
-            duration, format = self.player.query_duration(gst.FORMAT_TIME)
-        except:
-            duration = gst.CLOCK_TIME_NONE
-
-        return (position, duration)
+        return pygame.mixer.music.get_pos()
 
     def seek(self, duration):
-        """
-        @param location: time to seek to, in nanoseconds
-        """
-        gst.debug("seeking to %r" % location)
-        event = gst.event_new_seek(1.0, gst.FORMAT_TIME,
-                gst.SEEK_FLAG_FLUSH | gst.SEEK_FLAG_ACCURATE,
-                gst.SEEK_TYPE_SET, location,
-                gst.SEEK_TYPE_NONE, 0)
-
-        res = self.player.send_event(event)
-        if res:
-            gst.info("setting new stream time to 0")
-            self.player.set_new_stream_time(0L)
-        else:
-            gst.error("Seek to %r failed" % location)
+        pygame.mixer.music.set_pos(duration)
 
     def pause(self):
-        gst.info("pausing player")
-        self.player.set_state(gst.STATE_PAUSED)
-        self.playmode = False
+        pygame.mixer.music.pause()
+        self.playing = False
+
+    def unpause(self):
+        pygame.mixer.music.unpause()
+        self.playing = True 
 
     def play(self):
-        gst.info("playing player")
-        print("playing player")
-        self.player.set_state(gst.STATE_PLAYING)
-        self.playmode = True
+        print("player playin' g!")
+        pygame.mixer.music.play()
+        self.playing = True
 
     def stop(self):
-        self.player.set_state(gst.STATE_NULL)
-        gst.info("stopped player")
-        self.playmode = False
         print("stopped player")
-
-    def get_state(self, timeout=1):
-        return self.player.get_state(timeout=timeout)
+        pygame.mixer.music.stop()
+        self.playing = False
 
     def is_playing(self):
-        return self.playmode
+        return self.playing
 
-    def destroy(self):
-        self.running = False
+    def get_volume(self):
+        return pygame.mixer.music.get_volume()
 
-
+    def set_volume(self, vol):
+        self.volume = vol
+        pygame.mixer.music.set_volume(self.volume)
