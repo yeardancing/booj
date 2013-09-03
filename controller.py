@@ -6,7 +6,8 @@ import cherrypy
 from booj.lib import template, player
 from booj import database
 
-default_server_ip = "192.168.1.5"
+#default_server_ip = "192.168.1.15"
+default_server_ip = "192.168.1.6"
 server_ip = default_server_ip
 
 class Root(object):
@@ -30,24 +31,24 @@ class Root(object):
     @cherrypy.expose
     @template.output('song.html')
     def song(self, songId):
-        dummyfile = 'file:/home/dspadaro/src/python/cherrypy/Sine_wave_440.ogg'
+        songfile = self.db.getSongFileById(songId)
         if cherrypy.request.method == 'POST':
             if self.myplayer.is_playing():
                 self.myplayer.stop()
             else:
-                self.myplayer.set_location(dummyfile) 
+                print "playing", songfile[0]
+                self.myplayer.set_location(songfile[0]) 
                 self.myplayer.play()
 
         return template.render(songId=songId)
 
 def main(db):
     mydb = database.BoojDb(db)
-    myplayer = player.BoojPlayer(name="boojPlayer")
+    myplayer = player.BoojPlayer()
 
     def _save_data():
         if myplayer.is_playing():
             myplayer.stop()
-        myplayer.destroy()
         #databaseobj = open(database, 'wb')
 
     if hasattr(cherrypy.engine, 'subscribe'):
@@ -55,7 +56,7 @@ def main(db):
     else:
         cherrpy.engine.on_stop_engine_list.append(_save_data)
         
-    #This could go in a global confi gfile
+    #This could go in a global config file
     cherrypy.config.update({
         'tools.encode.on': True, 'tools.encode.encoding': 'utf-8',
         'tools.decode.on': True,
@@ -64,7 +65,6 @@ def main(db):
         'server.socket_host': server_ip
     })
 
-    myplayer.start()
     cherrypy.quickstart(Root(mydb, myplayer), '/', {
         '/media': {
             'tools.staticdir.on': True,

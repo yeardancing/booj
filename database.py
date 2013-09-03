@@ -19,13 +19,19 @@ class BoojDb():
         conn = sqlite3.connect(self.dbName)
         #conn.text_factory = str
         cur = conn.cursor()
-        print "artistId is", artistId
-        cur.execute('SELECT title, id FROM songs WHERE artistId=?', artistId)
+        cur.execute('SELECT title, id FROM songs WHERE artistId=?', [artistId])
         songs = cur.fetchall()
         conn.close()
-        #print "getSongsByArtistId", artistId
-        #print songs
         return songs
+
+    def getSongFileById(self, songId):
+        conn = sqlite3.connect(self.dbName)
+        #conn.text_factory = str
+        cur = conn.cursor()
+        cur.execute('SELECT filename FROM songs WHERE id=?', [songId])
+        filename = cur.fetchall()
+        conn.close()
+        return filename
 
     def rebuildDatabase(self, musicRoot):
         conn = sqlite3.connect(self.dbName)

@@ -11,13 +11,40 @@
   <script type="text/javascript">
     $(function() {
       $("#playnow").click(function() {
-        var postdata = { }  // post the form values via ajax
+        var postdata = { };  // post the form values via ajax
         $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
           $('#slider-0').val(0);    // and update controls
           $('#slider-0').slider('refresh');
+          if ($("#playbutton .ui-btn-text").text() == "Play")
+          {
+            $("#playbutton").buttonMarkup({ icon: "delete" });
+            $("#playbutton .ui-btn-text").text("Stop");
+          }
+          else
+          {
+            $("#playbutton").buttonMarkup({ icon: "arrow-r" });
+            $("#playbutton .ui-btn-text").text("Play");
+          }
         });
-        return false;
+        return true;
       });
+    });
+    $(function() {
+      $("#playbutton").click(function() {
+        $('#slider-0').val(50);    // and update controls
+        $('#slider-0').slider('refresh');
+        if ($("#playbutton .ui-btn-text").text() == "Play")
+        {
+          $("#playbutton").buttonMarkup({ icon: "delete" });
+          $("#playbutton .ui-btn-text").text("Stop");
+        }
+        else
+        {
+          $("#playbutton").buttonMarkup({ icon: "arrow-r" });
+          $("#playbutton .ui-btn-text").text("Play");
+        }
+      });
+      return true;
     });
   </script>
   <style media="screen" type="text/css">
@@ -40,9 +67,9 @@ input.ui-slider-input {display: none;}
       <a href="${url('/index/')}" data-icon="home" class="ui-btn-right">Home</a>
     </div><!-- /header -->
 
-    <div class="center-wrapper" id="playnow">
+    <div class="center-wrapper">
       <p>&nbsp;</p>
-      <input type="submit" value="Play" data-inline="true" /> 
+      <input type="submit" value="Play" data-inline="true" id="playnow"/> 
       <p>&nbsp;</p>
     </div>
     <div class="center-wrapper">

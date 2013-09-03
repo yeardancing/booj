@@ -11,7 +11,7 @@ class BoojPlayer:
 
     def set_location(self, location):
         print "setting location to %s" % location
-        pygame.mixer.music.load(location)
+        pygame.mixer.music.load(location[0].encode('utf8'))
         # volume is reset when new music is loaded
         pygame.mixer.music.set_volume(self.volume)
 
