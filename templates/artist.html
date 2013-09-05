@@ -24,12 +24,11 @@ input.ui-slider-input {display: none;}
   <body> 
     <div data-role="page" data-add-back-btn="true">
       <div data-role="header">
-        <h1>BoojPlayer</h1>
+        <h1>${artist[0]}</h1>
         <a href="${url('/index/')}" data-icon="home" class="ui-btn-right">Home</a>
       </div><!-- /header -->
   
       <div data-role="content">   
-        <p>Music of Artist</p>
         <ul data-role="listview" data-inset="true" data-filter="true">
           <li py:for="song in songs">     
             <a href="${url('/song/%s/' % song[1])}">${song[0]}</a>
