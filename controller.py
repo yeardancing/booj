@@ -63,6 +63,8 @@ class Root(object):
     @template.output('song.html')
     def song(self, songId):
         songfile = self.db.getSongFileById(songId)
+        artist = self.db.getArtistBySongId(songId)
+        songTitle = self.db.getSongTitleBySongId(songId)
         if cherrypy.request.method == 'POST':
             if self.myplayer.is_playing():
                 self.myplayer.stop()
@@ -71,7 +73,9 @@ class Root(object):
                 self.myplayer.set_location(songfile[0]) 
                 self.myplayer.play()
 
-        return template.render(songId=songId)
+        return template.render(songId=songId, 
+                               artist=artist, 
+                               songTitle=songTitle)
 
 def main(db):
     mydb = database.BoojDb(db)

@@ -25,6 +25,17 @@ class BoojDb():
             return artist[0]
         else:
             return ''
+
+    def getArtistBySongId(self, songId):
+        conn = sqlite3.connect(self.dbName)
+        cur = conn.cursor()
+        cur.execute('SELECT DISTINCT artist FROM songs WHERE id=?', [songId])
+        artist = cur.fetchall()
+        conn.close()
+        if artist and len(artist) == 1:
+            return artist[0]
+        else:
+            return ''
     
     def getSongsByArtistId(self, artistId):
         conn = sqlite3.connect(self.dbName)
@@ -44,6 +55,18 @@ class BoojDb():
         conn.close()
         if filename and len(filename) == 1:
             return filename[0]
+        else:
+            return ''
+
+    def getSongTitleBySongId(self, songId):
+        conn = sqlite3.connect(self.dbName)
+        #conn.text_factory = str
+        cur = conn.cursor()
+        cur.execute('SELECT DISTINCT title FROM songs WHERE id=?', [songId])
+        name = cur.fetchall()
+        conn.close()
+        if name and len(name) == 1:
+            return name[0]
         else:
             return ''
 
