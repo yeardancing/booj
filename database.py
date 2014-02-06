@@ -72,19 +72,18 @@ class BoojDb():
 
     def rebuildDatabase(self, musicRoot):
         conn = sqlite3.connect(self.dbName)
-        #conn.text_factory = str
         cur = conn.cursor()
-        sql = "CREATE TABLE IF NOT EXISTS songs\
-                (id INTEGER NOT NULL,\
-                 artist TEXT,\
-                 artistId INTEGER NOT NULL,\
-                 title TEXT,\
-                 album TEXT,\
-                 genre TEXT,\
-                 year INTEGER NOT NULL,\
-                 filename TEXT)"
-
-        cur.execute(sql)
+        cur.executescript("DROP TABLE IF EXISTS songs;\
+                          CREATE TABLE songs\
+                          (id INTEGER NOT NULL,\
+                          artist TEXT,\
+                          artistId INTEGER NOT NULL,\
+                          title TEXT,\
+                          album TEXT,\
+                          genre TEXT,\
+                          year INTEGER NOT NULL,\
+                          filename TEXT)")
+        conn.commit()
         sid = 1
         artistIds = {}
         aid = 1

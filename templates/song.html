@@ -11,16 +11,6 @@
   <script type="text/javascript" src="${url('/media/boojplayer.js')}"></script>
   <script type="text/javascript">
     $(function() {
-      $("#playnow").click(function() {
-        var postdata = { };  // post the form values via ajax
-        // this needs to just start the song from the beginning
-        $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
-          updateControls();
-        });
-        return true;
-      });
-    });
-    $(function() {
       $("#playbutton").click(function() {
         var postdata = { };  // post the form values via ajax
         // this should be some 'current song' identifier instead
@@ -54,7 +44,7 @@ input.ui-slider-input {display: none;}
 
     <div class="center-wrapper">
       <p>&nbsp;</p>
-      <input type="submit" value="Play" data-inline="true" id="playnow"/> 
+      <input type="button" value="Play" data-inline="true" id="playnow"/> 
       <p>&nbsp;</p>
     </div>
     <div class="center-wrapper">
@@ -68,5 +58,15 @@ input.ui-slider-input {display: none;}
 
     <xi:include href="_controls.html" />
   </div><!-- /page -->
+  <script type="text/javascript">
+    $("#playnow").click(function() {
+      var postdata = { };  // post the form values via ajax
+      // this needs to just start the song from the beginning
+      $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
+        updateControls();
+      });
+      return true;
+    });
+  </script>
 </body>
 </html>

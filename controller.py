@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-import operator, os, sys, socket
-
+import operator, os, sys, socket, getopt
 import cherrypy
 from booj.lib import template, player
 from booj import database
@@ -37,8 +36,6 @@ def get_lan_ip():
                 pass
     return ip
 
-server_ip = get_lan_ip()
-
 
 class Root(object):
 
@@ -69,7 +66,6 @@ class Root(object):
             if self.myplayer.is_playing():
                 self.myplayer.stop()
             else:
-                print "playing", songfile[0]
                 self.myplayer.set_location(songfile[0]) 
                 self.myplayer.play()
 
@@ -77,9 +73,12 @@ class Root(object):
                                artist=artist, 
                                songTitle=songTitle)
 
-def main(db):
+def main(db, doRebuild):
     mydb = database.BoojDb(db)
     myplayer = player.BoojPlayer()
+
+    if doRebuild:
+        mydb.rebuildDatabase(doRebuild)
 
     def _save_data():
         if myplayer.is_playing():
@@ -108,7 +107,23 @@ def main(db):
     })
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3:
-        server_ip =  sys.argv[2]
-    main(sys.argv[1])
+    doRebuild=""
+    server_ip = get_lan_ip()
+    db="booj.db"
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hd:r:a:",["database=","rebuild=","address="])
+    except getopt.GetoptError:
+        print '%s -d <databasefile> -r <databasedirectory> -a <bindaddress>' % sys.argv[0]
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print '%s -d <databasefile> -r <databasedirectory> -a <bindaddress>' % sys.argv[0]
+            sys.exit()
+        elif opt in ("-d", "--database"):
+            db = arg
+        elif opt in ("-r", "--rebuild"):
+            doRebuild = arg
+        elif opt in ("-a", "--address"):
+            server_ip = arg
+    main(db, doRebuild)
 
