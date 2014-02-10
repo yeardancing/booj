@@ -1,64 +1,138 @@
-import os, time 
+import os, time, threading
 import telnetlib
 
 class BoojPlayer:
     def __init__(self):
-        self.player = telnetlib.Telnet("localhost", "mpg123", 60)
-        self.player.read_until("\n")
+        self.songInfoLock = threading.RLock()
+        self.readWriteLock = threading.RLock()
+        with self.readWriteLock:
+            self.player = telnetlib.Telnet("localhost", "mpg123", 60)
+            output = self.player.read_until("\n", 1)
+        if not output: #TODO: exception?
+            print "Failed to start player!"
+            return
         self.set_volume(100)
-        self.curr_pos = 0
+        with self.songInfoLock:
+            self.curr_pos = 0
+            self.curr_time = 0
+            self.playing = False
+            self.location = ''
         self.max_pos = 0
         self.total_time = 0
-        self.playing = False
 
     def set_location(self, location):
-        print type(location)
+        """
+        Queue up a song to play next.  This takes a string
+        of the absolute path to the resource.
+
+        Be careful! If your let your song run to completion
+        you will no longer have a location set.  The files
+        you load are "clear on complete"
+
+        Returns the length of the song in seconds as a float.
+
+        """
         try:
             mylocation = location.encode('ascii', 'ignore')
         except UnicodeDecodeError:
             mylocation = location[0].encode('utf8')
-        self.player.write("L " + mylocation + "\n")
-        self.player.write("P\n")
-        load_output = self.player.read_until("@P 1\n")
-        self.max_pos = self.parse_for_last_frame(load_output)
-        self.total_time = self.parse_for_total_time(load_output)
-        self.player.write("J 0\n")
-        self.player.read_until("@J 0\n")
-        self.curr_pos = 0
+        with self.readWriteLock:
+            self.player.write("L " + mylocation + "\n")
+            #check for error here..
+            self.player.write("P\n")
+            load_output = self.player.read_until("@P 1\n", 1)
+            if not load_output: #TODO: exception?
+                print "Failed to load", mylocation
+                return
+            self.player.write("J 0\n")
+            jump_output = self.player.read_until("@J 0\n", 1)
+        if not load_output: #TODO: exception?
+            print "Failed to load", mylocation
+            return
+        with self.songInfoLock:
+            self.max_pos = self.parse_for_last_frame(load_output)
+            self.total_time = self.parse_for_total_time(load_output)
+            self.curr_pos = 0
+            self.curr_time = 0;
+            self.location = mylocation
+        return self.total_time
 
     def query_position(self):
-        return self.curr_pos
+        """Returns the current position as a float that is
+        the percentage of the way through the song.
+        """
+        with self.songInfoLock:
+            curr_pos = self.curr_pos
+        print "curr_pos", curr_pos
+        if curr_pos != 0:
+            return (float(curr_pos) / float(self.max_pos))
+        else:
+            return 0
 
-    def seek(self, duration):
-        framejump = (self._max_pos / self.total_time) * duration
-        self.player.write("J framejump\n")
-        self.player.read_until("@J 0\n")
+    def seek(self, position):
+        """Jump to the specified position.
+        Position is specified by a percentage (float) value.
+        """
+        with self.songInfoLock:
+            location = self.location
+        if not location:
+            print "No File loaded!"
+            return 
+        framejump = int(self.max_pos * position)
+        with self.readWriteLock:
+            self.player.write("J %i\n" % framejump)
+            jump_output = self.player.read_until("@J 0\n", 1)
+        if not jump_output: # TODO: exception?
+            print "Seek failed"
 
     def pause(self):
-        self.player.write("P\n")
-        self.player.read_until("@P 1\n")
-        self.playing = False
+        with self.songInfoLock:
+            self.playing = False
+        with self.readWriteLock:
+            self.player.write("P\n")
+            self.player.read_until("@P 1\n", 1)
 
     def unpause(self):
-        self.player.write("P\n")
-        self.player.read_until("@P 2\n")
-        self.playing = True 
+        if not self.location:
+            print "No File Loaded!"
+            return
+        with self.readWriteLock:
+            self.player.write("P\n")
+            output = self.player.read_until("@P 2\n", 1)
+        if not output:
+            print "Failed to start playing", self.location
+            return
+        with self.songInfoLock:
+            self.playing = True 
+        maintenanceEvent = threading.Timer(0.5, self.playerMaintenanceEvent)
+        maintenanceEvent.start()
 
     def play(self):
+        """Play your song.
+        A file location must have been specified first.
+        But note that you must also call play; songs do 
+        not automagically start playing on load.
+
+        """
         self.unpause()
-        self.playing = True
 
     def stop(self):
         self.pause()
-        self.playing = False
 
     def is_playing(self):
-        return self.playing
+        with self.songInfoLock:
+            playing = self.playing
+        return playing
 
     def get_volume(self):
         return self.volume
 
     def set_volume(self, vol):
+        """This function sets the analog volume using
+        the ALSA soundcard driver. Vol is an integer
+        percentage, 0-100.
+
+        """
         self.volume = vol
         volume_cmd = "amixer sset PCM,0 %d%%" % (self.volume)
         os.system(volume_cmd)
@@ -67,13 +141,36 @@ class BoojPlayer:
         lines = output.splitlines()
         for line in lines:
             if line.startswith("@F 0 "):
-                return line.split()[2]
+                return int(line.split()[2])
         return 0
 
     def parse_for_total_time(self, output):
         lines = output.splitlines()
         for line in lines:
             if line.startswith("@F 0 "):
-                return line.split()[4]
+                return float(line.split()[4])
         return 0
+
+    def playerMaintenanceEvent(self):
+        """Consumes mpg123 output while playing"""
+        curr_pos = 0
+        curr_time = 0.0
+        while self.playing:
+            with self.readWriteLock:
+                output = self.player.read_very_eager()
+            if not output:  # song must have stopped playing
+                with self.songInfoLock:
+                    self.playing = False
+                    self.location = ''
+                break;
+            lines = output.splitlines()
+            for line in lines:
+                tokens = line.split()
+                if len(tokens) > 4 and tokens[0] == "@F":
+                    curr_pos = int(tokens[1])
+                    curr_time = float(tokens[3])
+                    with self.songInfoLock:
+                        self.curr_pos = curr_pos
+                        self.curr_time = curr_time
+            time.sleep(1)
 
