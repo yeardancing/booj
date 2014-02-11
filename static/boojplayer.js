@@ -1,8 +1,11 @@
 function updateControls() 
 {
-    $('#slider-0').val(50);
+    $('#slider-0').val(90);
     $('#slider-0').slider('refresh');
-    if ($('#playbutton').prev('span').find('span.ui-btn-text').text() == "Play")
+    $('#playbutton').button('refresh');
+    console.log('isPlaying');
+    /*
+    if ()
     {
         $('#playbutton').prev('span').buttonMarkup({ icon: "delete" });
         $('#playbutton').prev('span').find('span.ui-btn-text').text("Stop");
@@ -12,4 +15,5 @@ function updateControls()
         $('#playbutton').prev('span').buttonMarkup({ icon: "arrow-r" });
         $('#playbutton').prev('span').find('span.ui-btn-text').text("Play");
     }
+    */
 };

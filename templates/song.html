@@ -52,7 +52,6 @@ input.ui-slider-input {display: none;}
 
     <xi:include href="_controls.html" />
 
-  <script type="text/javascript" src="${url('/media/boojplayer.js')}"></script>
   <script type="text/javascript">
     $('.play').bind('click', function(event, ui) {
       console.log('was clicked for song ' + this.id.substring(5) );
@@ -60,7 +59,11 @@ input.ui-slider-input {display: none;}
       // this needs to just start the song from the beginning
       $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
         console.log('POST success function' );
-        updateControls();
+        $("input[type='range']").val(90).slider("refresh");
+        playbutton = $('button#playbutton.ctrls');
+        playbutton.text('Stop');
+        playbutton.removeClass('ui-icon-arrow-r').addClass('ui-icon-delete');
+        playbutton.button('refresh');
       });
       return true;
     });

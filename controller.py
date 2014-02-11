@@ -47,14 +47,17 @@ class Root(object):
     @template.output('index.html')
     def index(self):
         artists = self.db.getArtists()
-        return template.render(artists=artists)
+        return template.render(artists = artists,
+                               isPlaying = self.myplayer.is_playing())
 
     @cherrypy.expose
     @template.output('artist.html')
     def artist(self, artistId):
         songs = self.db.getSongsByArtistId(artistId)
         myartist = self.db.getArtistById(artistId)
-        return template.render(artist=myartist, songs=songs)
+        return template.render(artist = myartist, 
+                               songs = songs,
+                               isPlaying = self.myplayer.is_playing())
 
     @cherrypy.expose
     @template.output('song.html')
@@ -63,15 +66,13 @@ class Root(object):
         artist = self.db.getArtistBySongId(songId)
         songTitle = self.db.getSongTitleBySongId(songId)
         if cherrypy.request.method == 'POST':
-            if self.myplayer.is_playing():
-                self.myplayer.stop()
-            else:
-                self.myplayer.set_location(songfile[0]) 
-                self.myplayer.play()
+            self.myplayer.set_location(songfile[0]) 
+            self.myplayer.play()
 
-        return template.render(songId=songId, 
-                               artist=artist, 
-                               songTitle=songTitle)
+        return template.render(songId = songId, 
+                               artist = artist, 
+                               songTitle = songTitle,
+                               isPlaying = self.myplayer.is_playing())
 
 def main(db, doRebuild):
     mydb = database.BoojDb(db)
@@ -111,13 +112,15 @@ if __name__ == '__main__':
     server_ip = get_lan_ip()
     db="booj.db"
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd:r:a:",["database=","rebuild=","address="])
+        opts, args = getopt.getopt(sys.argv[1:], 
+                                   "hd:r:a:",
+                                   ["database=","rebuild=","address="])
     except getopt.GetoptError:
-        print '%s -d <databasefile> -r <databasedirectory> -a <bindaddress>' % sys.argv[0]
+        print '%s -d <db_file> -r <db_dir> -a <bind_addr>' % sys.argv[0]
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print '%s -d <databasefile> -r <databasedirectory> -a <bindaddress>' % sys.argv[0]
+            print '%s -d <db_file> -r <db_dir> -a <bind_addr>' % sys.argv[0]
             sys.exit()
         elif opt in ("-d", "--database"):
             db = arg

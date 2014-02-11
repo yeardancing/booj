@@ -1,9 +1,11 @@
+<html xmlns:py="http://genshi.edgewall.org/">
 <div data-role="footer" data-id="nowplaying" data-position="fixed">
   <h1>Now Playing</h1>
   <div class="center-wrapper">
-    <div data-role="controlgroup" data-type="horizontal">
+    <div py:choose="isPlaying" data-role="controlgroup" data-type="horizontal">
       <a href="landing.html" data-role="button" data-icon="back">Prev</a>
-      <input id="playbutton" type="submit" value="Play" data-icon="arrow-r"/> 
+        <button py:when="True" id="playbutton" class="ctrls ui-btn ui-icon-delete ui-btn-icon-left ui-corner-all ui-shadow ui-btn-inline">Stop</button>
+        <button py:when="False" id="playbutton" class="ctrls  ui-btn ui-icon-arrow-r ui-btn-icon-left ui-corner-all ui-shadow ui-btn-inline">Play</button>
       <a href="landing.html" data-role="button" data-icon="forward">Next</a>
     </div>
 
@@ -13,3 +15,4 @@
     </form>
   </div><!-- align center -->
 </div><!-- /footer-->
+</html>
