@@ -61,14 +61,22 @@ class Root(object):
 
     @cherrypy.expose
     @template.output('song.html')
-    def song(self, songId):
+    def song(self, songId, playing=None):
         songfile = self.db.getSongFileById(songId)
         artist = self.db.getArtistBySongId(songId)
         songTitle = self.db.getSongTitleBySongId(songId)
         if cherrypy.request.method == 'POST':
-            self.myplayer.set_location(songfile[0]) 
-            self.myplayer.play()
-
+            if playing:
+                print "playing is true, so stop"
+                if str(playing) == 'true':
+                    self.myplayer.stop() 
+                else:
+                    print "playing is false, so start"
+                    self.myplayer.stop()
+            else:
+                print "playing is None, so start a new song"
+                self.myplayer.set_location(songfile[0]) 
+                self.myplayer.play()
         return template.render(songId = songId, 
                                artist = artist, 
                                songTitle = songTitle,

@@ -55,35 +55,57 @@ input.ui-slider-input {display: none;}
   <script type="text/javascript">
     $('.play').bind('click', function(event, ui) {
       console.log('was clicked for song ' + this.id.substring(5) );
+      // empty post data means just start the song from the beginning
       var postdata = { };  // post the form values via ajax
-      // this needs to just start the song from the beginning
       $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
         console.log('POST success function' );
         $("input[type='range']").val(90).slider("refresh");
         playbutton = $('button#playbutton.ctrls');
         playbutton.text('Stop');
         playbutton.removeClass('ui-icon-arrow-r').addClass('ui-icon-delete');
-        playbutton.button('refresh');
+        if (playbutton.length > 0) {
+          //playbutton.button();   //guess we might not need this?
+          console.log('Refreshed playbutton because it was there' );
+        } else {
+          console.log('button#playbutton.ctrls not initialized?' );
+        }
+      });
+      return true;
+    });
+    $('button#playbutton.ctrls').bind('click', function(event, ui) {
+      console.log('playbutton was clicked');
+      if ($(this).text() == 'Stop')
+      {
+         console.log('set playing to true');
+         var postdata = 'playing=true';  // post the form values via ajax
+      }
+      else
+      {
+         console.log('set playing to false');
+         var postdata = 'playing=false';  // post the form values via ajax
+      }
+      // this needs to just start the song from the beginning
+      $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
+        console.log('playbutton POST success function' );
+        $("input[type='range']").val(20).slider("refresh");
+        playbutton = $('button#playbutton.ctrls');
+        var newval = $(data).find('#playbutton');
+        console.log("newval: " + newval.text());
+        if (newval.text() == 'Play')
+        {
+            playbutton.text('Play');
+            playbutton.removeClass('ui-icon-delete').addClass('ui-icon-arrow-r');
+        }
+        else
+        {
+            playbutton.text('Stop');
+            playbutton.removeClass('ui-icon-arrow-r').addClass('ui-icon-delete');
+        }
       });
       return true;
     });
   </script>
 
   </div><!-- /page -->
-  <script type="text/javascript">
-  $( document ).ready(function() {
-  $( 'button' ).click(function() {
-      console.log( 'cgeneric console ...');
-  /*
-    var postdata = { };  // post the form values via ajax
-    // this should be some 'current song' identifier instead
-    // also; keep the play/stop state tied to the ... button text?
-    $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
-      updateControls();
-    });
-  */
-  });
-  });
-  </script>
 </body>
 </html>
