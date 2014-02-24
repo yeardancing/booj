@@ -67,12 +67,12 @@ class Root(object):
         songTitle = self.db.getSongTitleBySongId(songId)
         if cherrypy.request.method == 'POST':
             if playing:
-                print "playing is true, so stop"
                 if str(playing) == 'true':
+                    print "playing is true, so stop"
                     self.myplayer.stop() 
                 else:
                     print "playing is false, so start"
-                    self.myplayer.stop()
+                    self.myplayer.play()
             else:
                 print "playing is None, so start a new song"
                 self.myplayer.set_location(songfile[0]) 

@@ -76,7 +76,7 @@ class BoojPlayer:
         with self.songInfoLock:
             location = self.location
         if not location:
-            print "No File loaded!"
+            print "seek: No File loaded!"
             return 
         framejump = int(self.max_pos * position)
         with self.readWriteLock:
@@ -93,9 +93,11 @@ class BoojPlayer:
             self.player.read_until("@P 1\n", 1)
 
     def unpause(self):
-        if not self.location:
-            print "No File Loaded!"
-            return
+        with self.songInfoLock:
+            location = self.location
+        if not location:
+            print "seek: No File loaded!"
+            return 
         with self.readWriteLock:
             self.player.write("P\n")
             output = self.player.read_until("@P 2\n", 1)
@@ -161,6 +163,7 @@ class BoojPlayer:
             if not output:  # song must have stopped playing
                 with self.songInfoLock:
                     self.playing = False
+                    print "player thinks song is done; no output..."
                     self.location = ''
                 break;
             lines = output.splitlines()

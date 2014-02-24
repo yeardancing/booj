@@ -11,6 +11,8 @@
     $(document).on("mobileinit", function() {
       $.mobile.toolbar.prototype.options.addBackBtn = true;
       $.mobile.page.prototype.options.theme = "b";
+      var nowplaying = false;
+      var playerSliderValue = 0;
       // this causes the pagebeforeshow to not fire ??
       //$.mobile.defaultPageTransition = "flip";
   });
@@ -53,6 +55,24 @@ input.ui-slider-input {display: none;}
     <xi:include href="_controls.html" />
 
   <script type="text/javascript">
+    function incrementSlider() {
+      console.log('incrementSlider');
+    }
+    function updatePlayButton() {
+      playbutton = $('button#playbutton.ctrls');
+      if (nowplaying)
+      {
+        window.sliderTimer = setInterval(incrementSlider, 1000);
+        playbutton.text('Stop');
+        playbutton.removeClass('ui-icon-arrow-r').addClass('ui-icon-delete');
+      }
+      else
+      {
+        clearInterval(window.sliderTimer);
+        playbutton.text('Play');
+        playbutton.removeClass('ui-icon-delete').addClass('ui-icon-arrow-r');
+      }
+    }
     $('.play').bind('click', function(event, ui) {
       console.log('was clicked for song ' + this.id.substring(5) );
       // empty post data means just start the song from the beginning
@@ -60,47 +80,30 @@ input.ui-slider-input {display: none;}
       $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
         console.log('POST success function' );
         $("input[type='range']").val(90).slider("refresh");
-        playbutton = $('button#playbutton.ctrls');
-        playbutton.text('Stop');
-        playbutton.removeClass('ui-icon-arrow-r').addClass('ui-icon-delete');
-        if (playbutton.length > 0) {
-          //playbutton.button();   //guess we might not need this?
-          console.log('Refreshed playbutton because it was there' );
-        } else {
-          console.log('button#playbutton.ctrls not initialized?' );
-        }
+        nowplaying = true;
+        updatePlayButton();
       });
       return true;
     });
     $('button#playbutton.ctrls').bind('click', function(event, ui) {
       console.log('playbutton was clicked');
-      if ($(this).text() == 'Stop')
+      // this plays/pauses the current song
+      if (!nowplaying)
       {
          console.log('set playing to true');
          var postdata = 'playing=true';  // post the form values via ajax
+         nowplaying = true;
       }
       else
       {
          console.log('set playing to false');
          var postdata = 'playing=false';  // post the form values via ajax
+         nowplaying = false;
       }
-      // this needs to just start the song from the beginning
       $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
         console.log('playbutton POST success function' );
         $("input[type='range']").val(20).slider("refresh");
-        playbutton = $('button#playbutton.ctrls');
-        var newval = $(data).find('#playbutton');
-        console.log("newval: " + newval.text());
-        if (newval.text() == 'Play')
-        {
-            playbutton.text('Play');
-            playbutton.removeClass('ui-icon-delete').addClass('ui-icon-arrow-r');
-        }
-        else
-        {
-            playbutton.text('Stop');
-            playbutton.removeClass('ui-icon-arrow-r').addClass('ui-icon-delete');
-        }
+        updatePlayButton();
       });
       return true;
     });
