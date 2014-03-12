@@ -58,18 +58,18 @@ input.ui-slider-input {display: none;}
     function incrementSlider() {
       console.log('incrementSlider');
     }
-    function updatePlayButton() {
+    function updatePlayButton(isplaying) {
       playbutton = $('button#playbutton.ctrls');
-      if (nowplaying)
+      if (isplaying === "true")
       {
         window.sliderTimer = setInterval(incrementSlider, 1000);
-        playbutton.text('Stop');
+        playbutton.text("Stop");
         playbutton.removeClass('ui-icon-arrow-r').addClass('ui-icon-delete');
       }
       else
       {
         clearInterval(window.sliderTimer);
-        playbutton.text('Play');
+        playbutton.text("Play");
         playbutton.removeClass('ui-icon-delete').addClass('ui-icon-arrow-r');
       }
     }
@@ -78,32 +78,35 @@ input.ui-slider-input {display: none;}
       // empty post data means just start the song from the beginning
       var postdata = { };  // post the form values via ajax
       $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
-        console.log('POST success function' );
-        $("input[type='range']").val(90).slider("refresh");
-        nowplaying = true;
-        updatePlayButton();
+        if (data.playing)
+        {
+          console.log('JSON.playing: ' + data.playing );
+          $("input[type='range']").val(90).slider("refresh");
+          updatePlayButton(data.playing);
+        }
       });
       return true;
     });
     $('button#playbutton.ctrls').bind('click', function(event, ui) {
       console.log('playbutton was clicked');
       // this plays/pauses the current song
-      if (!nowplaying)
+      playbutton = $('button#playbutton.ctrls');
+      if (playbutton.text() == "PlayPlay")
       {
-         console.log('set playing to true');
-         var postdata = 'playing=true';  // post the form values via ajax
-         nowplaying = true;
+         console.log('set playnow to true');
+         var postdata = 'playnow=true';  // post the form values via ajax
       }
       else
       {
-         console.log('set playing to false');
-         var postdata = 'playing=false';  // post the form values via ajax
-         nowplaying = false;
+         console.log('set playnow to false');
+         var postdata = 'playnow=false';  // post the form values via ajax
       }
       $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
-        console.log('playbutton POST success function' );
-        $("input[type='range']").val(20).slider("refresh");
-        updatePlayButton();
+        if (data.playing)
+        {
+          $("input[type='range']").val(20).slider("refresh");
+          updatePlayButton(data.playing);
+        }
       });
       return true;
     });

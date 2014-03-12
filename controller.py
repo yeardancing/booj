@@ -2,6 +2,7 @@
 
 import operator, os, sys, socket, getopt
 import cherrypy
+import json
 from booj.lib import template, player
 from booj import database
 
@@ -61,22 +62,27 @@ class Root(object):
 
     @cherrypy.expose
     @template.output('song.html')
-    def song(self, songId, playing=None):
+    def song(self, songId, playnow=None):
         songfile = self.db.getSongFileById(songId)
         artist = self.db.getArtistBySongId(songId)
         songTitle = self.db.getSongTitleBySongId(songId)
         if cherrypy.request.method == 'POST':
-            if playing:
-                if str(playing) == 'true':
-                    print "playing is true, so stop"
-                    self.myplayer.stop() 
+            cherrypy.response.headers['Content-Type'] = "application/json"
+            if playnow:
+                if str(playnow) == 'true':
+                    print "playing is true, so start"
+                    self.myplayer.play() 
+                    message = {"playing" : "true" }
                 else:
-                    print "playing is false, so start"
-                    self.myplayer.play()
+                    print "playing is false, so stop"
+                    self.myplayer.stop()
+                    message = {"playing" : "false" }
             else:
                 print "playing is None, so start a new song"
                 self.myplayer.set_location(songfile[0]) 
                 self.myplayer.play()
+                message = {"playing" : "true" }
+            return json.dumps(message)
         return template.render(songId = songId, 
                                artist = artist, 
                                songTitle = songTitle,
