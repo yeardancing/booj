@@ -2,22 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:py="http://genshi.edgewall.org/">
-  <head> 
-    <meta name="viewport" content="width=device-width, initial-scale=1"></meta> 
-    <title>Music Demo</title> 
-    <link rel="stylesheet" href="${url('/media/jquery.mobile-1.4.0.css')}" type="text/css" />
-    <script type="text/javascript" src="${url('/media/jquery-1.11.0.js')}"></script>
+<head> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"></meta> 
+  <title>Music Demo</title> 
+  <link rel="stylesheet" href="${url('/media/jquery.mobile-1.4.0.css')}" type="text/css" />
+  <script type="text/javascript" src="${url('/media/jquery-1.11.0.js')}"></script>
   <script type="text/javascript">
     $(document).on("mobileinit", function() {
       $.mobile.toolbar.prototype.options.addBackBtn = true;
       $.mobile.page.prototype.options.theme = "b";
       //$.mobile.defaultPageTransition = "flip";
-  });
+    });
   </script>
-    <script type="text/javascript" src="${url('/media/jquery.mobile-1.4.0.js')}"></script>
-    <style media="screen" type="text/css">
+  <script type="text/javascript" src="${url('/media/jquery.mobile-1.4.0.js')}"></script>
+  <style media="screen" type="text/css">
 
-input.ui-slider-input {display: none;}
+.ui-slider-input input {display: none;}
 .center-wrapper{
     text-align: center;
 }
@@ -25,25 +25,27 @@ input.ui-slider-input {display: none;}
     margin: 0 auto;
 }
 
-    </style>
-  </head> 
+  </style>
+</head> 
 
-  <body> 
-    <div data-role="page" data-add-back-btn="true">
-      <div data-role="header">
-        <h1>${artist[0]}</h1>
-        <a href="${url('/index/')}" data-icon="home" class="ui-btn-right">Home</a>
-      </div><!-- /header -->
-  
-      <div data-role="content">   
-        <ul data-role="listview" data-inset="true" data-filter="true">
-          <li py:for="song in songs">     
-            <a href="${url('/song/%s/' % song[1])}">${song[0]}</a>
-          </li>
-        </ul>
-      </div>
-  
-     <xi:include href="_controls.html" />
-    </div><!-- /page -->
-  </body>
+<body> 
+  <div data-role="page" data-add-back-btn="true">
+    <div data-role="header">
+      <h1>${artist[0]}</h1>
+      <a href="${url('/index/')}" data-icon="home" class="ui-btn-right">Home</a>
+    </div><!-- /header -->
+
+    <div data-role="content">   
+      <ul data-role="listview" data-inset="true" data-filter="true">
+        <li py:for="song in songs">     
+          <a href="${url('/song/%s/' % song[1])}">${song[0]}</a>
+        </li>
+      </ul>
+    </div>
+
+    <xi:include href="_controls.html" />
+    <script type="text/javascript" src="${url('/media/controls.js')}"></script>
+
+  </div><!-- /page -->
+</body>
 </html>

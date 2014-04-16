@@ -46,16 +46,26 @@ class Root(object):
 
     @cherrypy.expose
     @template.output('index.html')
-    def index(self):
+    def index(self, playnow=None):
         artists = self.db.getArtists()
+        if cherrypy.request.method == 'POST':
+            cherrypy.response.headers['Content-Type'] = "application/json"
+            if playnow:
+                message = self.actOnPlayNow(playnow)
+            return json.dumps(message)
         return template.render(artists = artists,
                                isPlaying = self.myplayer.is_playing())
 
     @cherrypy.expose
     @template.output('artist.html')
-    def artist(self, artistId):
+    def artist(self, artistId, playnow=None):
         songs = self.db.getSongsByArtistId(artistId)
         myartist = self.db.getArtistById(artistId)
+        if cherrypy.request.method == 'POST':
+            cherrypy.response.headers['Content-Type'] = "application/json"
+            if playnow:
+                message = self.actOnPlayNow(playnow)
+            return json.dumps(message)
         return template.render(artist = myartist, 
                                songs = songs,
                                isPlaying = self.myplayer.is_playing())
@@ -69,24 +79,28 @@ class Root(object):
         if cherrypy.request.method == 'POST':
             cherrypy.response.headers['Content-Type'] = "application/json"
             if playnow:
-                if str(playnow) == 'true':
-                    print "playing is true, so start"
-                    self.myplayer.play() 
-                    message = {"playing" : "true" }
-                else:
-                    print "playing is false, so stop"
-                    self.myplayer.stop()
-                    message = {"playing" : "false" }
+                message = self.actOnPlayNow(playnow)
             else:
-                print "playing is None, so start a new song"
                 self.myplayer.set_location(songfile[0]) 
                 self.myplayer.play()
-                message = {"playing" : "true" }
+                message = { 'playing'   : 'true',
+                            'artist'    : artist,
+                            'song'      : songTitle }
             return json.dumps(message)
         return template.render(songId = songId, 
                                artist = artist, 
                                songTitle = songTitle,
                                isPlaying = self.myplayer.is_playing())
+
+    def actOnPlayNow(self, playnow):
+        if str(playnow) == 'true':
+            self.myplayer.play() 
+            message = {"playing" : "true" }
+        else:
+            self.myplayer.stop()
+            message = {"playing" : "false" }
+        return message
+    
 
 def main(db, doRebuild):
     mydb = database.BoojDb(db)
@@ -107,7 +121,8 @@ def main(db, doRebuild):
         
     #This could go in a global config file
     cherrypy.config.update({
-        'tools.encode.on': True, 'tools.encode.encoding': 'utf-8',
+        'tools.encode.on': True, 
+        'tools.encode.encoding': 'utf-8',
         'tools.decode.on': True,
         'tools.trailing_slash.on': True,
         'tools.staticdir.root': os.path.abspath(os.path.dirname(__file__)),

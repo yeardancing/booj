@@ -1,17 +1,17 @@
 <html xmlns:py="http://genshi.edgewall.org/">
 <div data-role="footer" data-id="nowplaying" data-position="fixed">
-  <h1>Now Playing</h1>
+  <h1 id="currentsong">Now Playing</h1>
   <div class="center-wrapper">
     <div py:choose="isPlaying" data-role="controlgroup" data-type="horizontal">
       <a href="landing.html" data-role="button" data-icon="back">Prev</a>
         <button py:when="True" id="playbutton" class="ctrls ui-btn ui-icon-delete ui-btn-icon-left ui-corner-all ui-shadow ui-btn-inline">Stop</button>
-        <button py:when="False" id="playbutton" class="ctrls  ui-btn ui-icon-arrow-r ui-btn-icon-left ui-corner-all ui-shadow ui-btn-inline">Play</button>
+        <button py:when="False" id="playbutton" class="ctrls ui-btn ui-icon-arrow-r ui-btn-icon-left ui-corner-all ui-shadow ui-btn-inline">Play</button>
       <a href="landing.html" data-role="button" data-icon="forward">Next</a>
     </div>
 
-    <form>
+    <form class="ui-slider-input">
       <label for="slider-0" class="ui-hidden-accessible">Input slider:</label>
-      <input type="range" name="slider" id="slider-0" value="25" min="0" max="100" data-mini="true" />
+      <input type="range" name="slider-0" id="slider-0" min="0" max="100" value="50" data-mini="true"/>
     </form>
   </div><!-- align center -->
 </div><!-- /footer-->

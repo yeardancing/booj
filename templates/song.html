@@ -11,10 +11,7 @@
     $(document).on("mobileinit", function() {
       $.mobile.toolbar.prototype.options.addBackBtn = true;
       $.mobile.page.prototype.options.theme = "b";
-      var nowplaying = false;
-      var playerSliderValue = 0;
-      // this causes the pagebeforeshow to not fire ??
-      //$.mobile.defaultPageTransition = "flip";
+      var nowplaying = ${isPlaying};
   });
   </script>
   <script type="text/javascript" src="${url('/media/jquery.mobile-1.4.0.js')}"></script>
@@ -53,64 +50,7 @@ input.ui-slider-input {display: none;}
     </div>
 
     <xi:include href="_controls.html" />
-
-  <script type="text/javascript">
-    function incrementSlider() {
-      console.log('incrementSlider');
-    }
-    function updatePlayButton(isplaying) {
-      playbutton = $('button#playbutton.ctrls');
-      if (isplaying === "true")
-      {
-        window.sliderTimer = setInterval(incrementSlider, 1000);
-        playbutton.text("Stop");
-        playbutton.removeClass('ui-icon-arrow-r').addClass('ui-icon-delete');
-      }
-      else
-      {
-        clearInterval(window.sliderTimer);
-        playbutton.text("Play");
-        playbutton.removeClass('ui-icon-delete').addClass('ui-icon-arrow-r');
-      }
-    }
-    $('.play').bind('click', function(event, ui) {
-      console.log('was clicked for song ' + this.id.substring(5) );
-      // empty post data means just start the song from the beginning
-      var postdata = { };  // post the form values via ajax
-      $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
-        if (data.playing)
-        {
-          console.log('JSON.playing: ' + data.playing );
-          $("input[type='range']").val(90).slider("refresh");
-          updatePlayButton(data.playing);
-        }
-      });
-      return true;
-    });
-    $('button#playbutton.ctrls').bind('click', function(event, ui) {
-      console.log('playbutton was clicked');
-      // this plays/pauses the current song
-      playbutton = $('button#playbutton.ctrls');
-      if (playbutton.text() == "PlayPlay")
-      {
-         console.log('set playnow to true');
-         var postdata = 'playnow=true';  // post the form values via ajax
-      }
-      else
-      {
-         console.log('set playnow to false');
-         var postdata = 'playnow=false';  // post the form values via ajax
-      }
-      $.post("${url('/song/%s/' % songId)}", postdata, function(data) {
-        if (data.playing)
-        {
-          $("input[type='range']").val(20).slider("refresh");
-          updatePlayButton(data.playing);
-        }
-      });
-      return true;
-    });
-  </script>
+    <script type="text/javascript" src="${url('/media/controls.js')}"></script>
 
   </div><!-- /page -->
 </body>
