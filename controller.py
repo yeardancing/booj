@@ -81,11 +81,12 @@ class Root(object):
             if playnow:
                 message = self.actOnPlayNow(playnow)
             else:
-                self.myplayer.set_location(songfile[0]) 
+                duration = self.myplayer.set_location(songfile[0]) 
                 self.myplayer.play()
                 message = { 'playing'   : 'true',
                             'artist'    : artist,
-                            'song'      : songTitle }
+                            'song'      : songTitle,
+                            'duration'  : int(duration) }
             return json.dumps(message)
         return template.render(songId = songId, 
                                artist = artist, 
@@ -95,10 +96,12 @@ class Root(object):
     def actOnPlayNow(self, playnow):
         if str(playnow) == 'true':
             self.myplayer.play() 
-            message = {"playing" : "true" }
+            message = { 'playing'  : 'true',
+                        'position' : self.myplayer.query_position() }
         else:
             self.myplayer.stop()
-            message = {"playing" : "false" }
+            message = { 'playing'  : 'false',
+                        'position' : self.myplayer.query_position() }
         return message
     
 
