@@ -50,8 +50,11 @@ $('.play').bind('click', function(event, ui) {
         if (data.duration)
         {
             // TODO
-            $('input#slider-0').slider('option', 'max', data.duration);
-            $('input[type="number"]#slider-0').slider('option', 'max', data.duration);
+            console.log('setting max val to ' + data.duration);
+            //$('input#slider-0').slider('option', 'max', data.duration);
+            $('input#slider-0').attr('max', data.duration);
+            //$('input[type="number"]#slider-0').slider('option', 'max', data.duration);
+            $('input[type="number"]#slider-0').attr('max', data.duration);
         }
         $('input[type="number"]#slider-0').val(0).slider('refresh');
     });

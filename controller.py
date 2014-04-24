@@ -82,6 +82,8 @@ class Root(object):
                 message = self.actOnPlayNow(playnow)
             else:
                 duration = self.myplayer.set_location(songfile[0]) 
+                #TODO: not returning length of song...
+                print "duration in seconds is", duration
                 self.myplayer.play()
                 message = { 'playing'   : 'true',
                             'artist'    : artist,
@@ -96,6 +98,7 @@ class Root(object):
     def actOnPlayNow(self, playnow):
         if str(playnow) == 'true':
             self.myplayer.play() 
+            #TODO: query position not working either... divide by zero line 68
             message = { 'playing'  : 'true',
                         'position' : self.myplayer.query_position() }
         else:
