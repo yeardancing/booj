@@ -5,8 +5,10 @@ from booj.lib import player
 
 def main(srcfile):
     myplayer = player.BoojPlayer()
-    myplayer.set_location(srcfile)
-    #print "main sleeping.."
+    duration = myplayer.set_location(srcfile)
+    if duration != 194.27:
+        print 'playerTest:' + '\033[91m' + '\t\tFAIL' + '\033[0m'
+        return
     myplayer.play()
     time.sleep(2)
     playing = myplayer.is_playing()

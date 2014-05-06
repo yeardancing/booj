@@ -32,6 +32,7 @@ class BoojPlayer:
         Returns the length of the song in seconds as a float.
 
         """
+        load_output = ''
         try:
             mylocation = location.encode('ascii', 'ignore')
         except UnicodeDecodeError:
@@ -40,7 +41,7 @@ class BoojPlayer:
             self.player.write("L " + mylocation + "\n")
             #check for error here..
             self.player.write("P\n")
-            load_output = self.player.read_until("@P 1\n", 1)
+            load_output = self.player.read_until("@F 1\n", 1)
             if not load_output: #TODO: exception?
                 print "Failed to load", mylocation
                 return
@@ -52,6 +53,9 @@ class BoojPlayer:
         with self.songInfoLock:
             self.max_pos = self.parse_for_last_frame(load_output)
             self.total_time = self.parse_for_total_time(load_output)
+            print "load_output", load_output
+            print "max_pos", self.max_pos
+            print "total_time", self.total_time
             self.curr_pos = 0
             self.curr_time = 0;
             self.location = mylocation
@@ -63,10 +67,11 @@ class BoojPlayer:
         """
         with self.songInfoLock:
             curr_pos = self.curr_pos
-        print "curr_pos", curr_pos
-        if curr_pos != 0:
+        print 'curr_pos', curr_pos, 'max_pos', self.max_pos
+        if curr_pos != 0 and self.max_pos != 0:
             return (float(curr_pos) / float(self.max_pos))
         else:
+            print 'zeroooooooossss!'
             return 0
 
     def seek(self, position):

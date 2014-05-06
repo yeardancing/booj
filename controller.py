@@ -82,8 +82,7 @@ class Root(object):
                 message = self.actOnPlayNow(playnow)
             else:
                 duration = self.myplayer.set_location(songfile[0]) 
-                #TODO: not returning length of song...
-                print "duration in seconds is", duration
+                print "duration:", duration
                 self.myplayer.play()
                 message = { 'playing'   : 'true',
                             'artist'    : artist,
