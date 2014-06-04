@@ -32,7 +32,6 @@ class BoojPlayer:
         Returns the length of the song in seconds as a float.
 
         """
-        load_output = ''
         try:
             mylocation = location.encode('ascii', 'ignore')
         except UnicodeDecodeError:
@@ -40,8 +39,16 @@ class BoojPlayer:
         with self.readWriteLock:
             self.player.write("L " + mylocation + "\n")
             #check for error here..
+
+            # Putting the read_until _before_ the pause causes the song
+            # to play 1-2 seconds before pausing, but otherwise we can
+            # miss the information in the '@F n ....' lines
+            # Perhaps just delay gathering this information until the 
+            # song is started (unpaused)?
+            #
+            #Also should check and see if its necessary to set volume to 0 here
+            load_output = self.player.read_until("@F 0\n", 1)
             self.player.write("P\n")
-            load_output = self.player.read_until("@F 1\n", 1)
             if not load_output: #TODO: exception?
                 print "Failed to load", mylocation
                 return
@@ -54,6 +61,7 @@ class BoojPlayer:
             self.max_pos = self.parse_for_last_frame(load_output)
             self.total_time = self.parse_for_total_time(load_output)
             print "load_output", load_output
+            print "jump_output", jump_output
             print "max_pos", self.max_pos
             print "total_time", self.total_time
             self.curr_pos = 0

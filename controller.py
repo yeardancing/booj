@@ -53,8 +53,14 @@ class Root(object):
             if playnow:
                 message = self.actOnPlayNow(playnow)
             return json.dumps(message)
+        isPlaying = self.myplayer.is_playing()
+        position = 0
+        if isPlaying:
+            position = self.myplayer.query_position()
+        #TODO: should pass Song object here
         return template.render(artists = artists,
-                               isPlaying = self.myplayer.is_playing())
+                               isPlaying = isPlaying,
+                               position = position)
 
     @cherrypy.expose
     @template.output('artist.html')
@@ -66,9 +72,15 @@ class Root(object):
             if playnow:
                 message = self.actOnPlayNow(playnow)
             return json.dumps(message)
+        isPlaying = self.myplayer.is_playing()
+        position = 0
+        if isPlaying:
+            position = self.myplayer.query_position()
+        #TODO: should pass Song object here
         return template.render(artist = myartist, 
                                songs = songs,
-                               isPlaying = self.myplayer.is_playing())
+                               isPlaying = isPlaying,
+                               position = position)
 
     @cherrypy.expose
     @template.output('song.html')
@@ -89,15 +101,20 @@ class Root(object):
                             'song'      : songTitle,
                             'duration'  : int(duration) }
             return json.dumps(message)
+        isPlaying = self.myplayer.is_playing()
+        position = 0
+        if isPlaying:
+            position = self.myplayer.query_position()
+        #TODO: should pass Song object here
         return template.render(songId = songId, 
                                artist = artist, 
                                songTitle = songTitle,
-                               isPlaying = self.myplayer.is_playing())
+                               isPlaying = isPlaying,
+                               position = position)
 
     def actOnPlayNow(self, playnow):
         if str(playnow) == 'true':
             self.myplayer.play() 
-            #TODO: query position not working either... divide by zero line 68
             message = { 'playing'  : 'true',
                         'position' : self.myplayer.query_position() }
         else:

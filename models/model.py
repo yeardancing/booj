@@ -6,6 +6,8 @@ class Song(object):
         self.title = title
         self.artist = artist
         self.id = ident
+        self.position = 0
+        self.duration = 0
 
     def __repr__(self):
         return '<%s %r>' % (type(self).__name__, self.title)
