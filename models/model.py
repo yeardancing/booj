@@ -1,5 +1,12 @@
 from datetime import datetime
 
+class Position(object):
+    
+    def __init__(self):
+        self.currentTime = 0
+        self.maxTime = 0
+        self.currentPosition = 0
+
 class Song(object):
 
     def __init__(self, title, artist, ident):

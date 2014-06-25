@@ -4,6 +4,7 @@ import operator, os, sys, socket, getopt
 import cherrypy
 import json
 from booj.lib import template, player
+from booj.models import model
 from booj import database
 
 if os.name != "nt":
@@ -54,7 +55,7 @@ class Root(object):
                 message = self.actOnPlayNow(playnow)
             return json.dumps(message)
         isPlaying = self.myplayer.is_playing()
-        position = 0
+        position = Position()
         if isPlaying:
             position = self.myplayer.query_position()
         #TODO: should pass Song object here
@@ -73,7 +74,7 @@ class Root(object):
                 message = self.actOnPlayNow(playnow)
             return json.dumps(message)
         isPlaying = self.myplayer.is_playing()
-        position = 0
+        position = Position()
         if isPlaying:
             position = self.myplayer.query_position()
         #TODO: should pass Song object here
@@ -102,7 +103,7 @@ class Root(object):
                             'duration'  : int(duration) }
             return json.dumps(message)
         isPlaying = self.myplayer.is_playing()
-        position = 0
+        position = Position()
         if isPlaying:
             position = self.myplayer.query_position()
         #TODO: should pass Song object here
@@ -116,11 +117,11 @@ class Root(object):
         if str(playnow) == 'true':
             self.myplayer.play() 
             message = { 'playing'  : 'true',
-                        'position' : self.myplayer.query_position() }
+                        'position' : self.myplayer.query_position().currentPosition }
         else:
             self.myplayer.stop()
             message = { 'playing'  : 'false',
-                        'position' : self.myplayer.query_position() }
+                        'position' : self.myplayer.query_position().currentPosition }
         return message
     
 

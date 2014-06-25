@@ -1,5 +1,6 @@
 import os, time, threading
 import telnetlib
+from booj.models import model
 
 class BoojPlayer:
     def __init__(self):
@@ -70,17 +71,23 @@ class BoojPlayer:
         return self.total_time
 
     def query_position(self):
-        """Returns the current position as a float that is
-        the percentage of the way through the song.
+        """Returns a Position object with the following members:
+            * the current position as a float that is
+              the percentage of the way through the song.
+            * the current time in seconds
+            * the song length in seconds
         """
+        p = Position()
         with self.songInfoLock:
             curr_pos = self.curr_pos
+            p.currentTime = self.curr_time
+            p.maxTime = self.total_time
         print 'curr_pos', curr_pos, 'max_pos', self.max_pos
         if curr_pos != 0 and self.max_pos != 0:
-            return (float(curr_pos) / float(self.max_pos))
+            p.currentPosition = (float(curr_pos) / float(self.max_pos))
         else:
             print 'zeroooooooossss!'
-            return 0
+        return p 
 
     def seek(self, position):
         """Jump to the specified position.
