@@ -1,7 +1,8 @@
 import time
 import pygame
+from booj.lib import BoojPlayer
 
-class PygamePlayer:
+class PygamePlayer(BoojPlayer):
     def __init__(self):
         print "boojplayer init!"
         pygame.mixer.init()

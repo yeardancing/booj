@@ -7,6 +7,9 @@ class Position(object):
         self.maxTime = 0
         self.currentPosition = 0
 
+    def __repr__(self):
+        return '<%s %f %f %f>' % (type(self).__name__, self.currentTime, self.maxTime, self.currentPosition)
+
 class Song(object):
 
     def __init__(self, title, artist, ident):
