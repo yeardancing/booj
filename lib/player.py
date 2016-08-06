@@ -1,8 +1,13 @@
+import Queue
+import time
 from booj.models import model
+from simpistreamer.pipystreamer import PiPyStreamer
 
 class BoojPlayer:
     def __init__(self):
-        pass
+        self.q = Queue.Queue()
+        self.resp_q = Queue.Queue()
+        self.server = PiPyStreamer(self.q, self.resp_q).start()
 
     def set_location(self, location):
         """
@@ -16,7 +21,17 @@ class BoojPlayer:
         Returns the length of the song in seconds as a float.
 
         """
-        return 0.0
+        uri = 'l ' + location
+        self.q.put(uri)
+
+        time.sleep(0.3)
+        length = 0.0
+        self.q.put('d')
+        try:
+            length = float(self.resp_q.get())
+        except ValueError:
+            print "couldn't get duration after load"
+        return length
 
     def query_position(self):
         """Returns a Position object with the following members:
@@ -25,25 +40,47 @@ class BoojPlayer:
             * the current time in seconds
             * the song length in seconds
         """
-        return Position()
+        pos = model.Position()
+
+        self.q.put('p')
+        curr = self.resp_q.get()
+        try:
+            pos.currentTime = float(curr)
+        except ValueError:
+            print "couldn't query position:" + curr
+
+        self.q.put('d')
+        length = self.resp_q.get()
+        try:
+            pos.maxTime = float(length)
+        except ValueError:
+            print "couldn't query position:" + length
+        pos.currentPosition = pos.currentTime / pos.maxTime 
+        return pos
 
     def seek(self, position):
         """Jump to the specified position.
         Position is specified by a percentage (float) value.
         """
-        pass
+        self.q.put('d')
+        try:
+            length = float(self.resp_q.get())
+        except ValueError:
+            print "couldn't seek (bad duration)"
+        seek = 's ' + str(position * length)
+        self.q.put(seek)
 
     def pause(self):
         """Pauses current song in progress.  Does nothing if
         no song is playing.
         """
-        pass
+        self.stop()
 
     def unpause(self):
         """Unpauses current song in progress.  Does nothing if
         no song is loaded.
         """
-        pass
+        self.play()
 
     def play(self):
         """Play your song.
@@ -52,12 +89,12 @@ class BoojPlayer:
         not automagically start playing on load.
 
         """
-        pass
+        self.q.put('g')
 
     def stop(self):
         """Pauses current song in progress.  Same as pause.
         """
-        pass
+        self.q.put('n')
 
     def is_playing(self):
         """Returns True if a song is currently playing,
@@ -68,7 +105,14 @@ class BoojPlayer:
     def get_volume(self):
         """Returns analog volume as an integer percentage, 0-100.
         """
-        return 0
+        volume = -1.0
+        self.q.put('t')
+        vol = self.resp_q.get()
+        try:
+            volume = 100 * float(vol)
+        except ValueError:
+            print "Couldn't get volume" + vol
+        return volume
 
     def set_volume(self, vol):
         """This function sets the analog volume using
@@ -76,5 +120,12 @@ class BoojPlayer:
         percentage, 0-100.
 
         """
-        pass
+        self.q.put('v ' + str(vol))
+
+    def destroy(self):
+        """Stops the music server.
+
+        """
+        self.q.put('q')
+
 

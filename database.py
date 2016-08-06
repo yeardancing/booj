@@ -70,6 +70,22 @@ class BoojDb():
         else:
             return ''
 
+    def validateTags(self, id3info):
+        artist = title = album = genre = 'Unknown'
+        year = 0
+        for k, v in id3info.items():
+            if k == 'ARTIST':
+                artist = id3info['ARTIST']
+            elif k == 'TITLE':
+                title = id3info['TITLE']
+            elif k == 'ALBUM':
+                album = id3info['ALBUM']
+            elif k == 'GENRE':
+                genre = id3info['GENRE']
+            elif k == 'YEAR':
+                year = id3info['YEAR']
+        return artist, title, album, genre, int(year)
+
     def rebuildDatabase(self, musicRoot):
         conn = sqlite3.connect(self.dbName)
         cur = conn.cursor()
@@ -98,7 +114,7 @@ class BoojDb():
                         print "Invalid ID3 tag:", message
                         continue
 
-                    artist = id3info['ARTIST']
+                    artist, title, album, genre, year = self.validateTags(id3info)
                     if artist in artistIds:
                         artistId = artistIds[artist]
                     else:
@@ -106,16 +122,21 @@ class BoojDb():
                         artistIds[artist] = aid
                         aid += 1
 
-                    cur.execute('INSERT INTO songs VALUES(?,?,?,?,?,?,?,?)',
-                               (sid, 
-                                unicode(artist, 'latin_1'), 
-                                artistId,
-                                unicode(id3info['TITLE'], 'latin_1'),
-                                unicode(id3info['ALBUM'], 'latin_1'),
-                                unicode(id3info['GENRE'], 'latin_1'),
-                                id3info['YEAR'],    #id3info['TRACKNUMBER']
-                                unicode(currfile, 'latin_1')))
-                    conn.commit() 
-                    sid = sid + 1
+                    try:
+                        cur.execute('INSERT INTO songs VALUES(?,?,?,?,?,?,?,?)',
+                                    (sid, 
+                                    unicode(artist, 'latin_1'), 
+                                    artistId,
+                                    unicode(title, 'latin_1'),
+                                    unicode(album, 'latin_1'),
+                                    unicode(genre, 'latin_1'),
+                                    year,
+                                    unicode(currfile, 'latin_1')))
+                        conn.commit() 
+                        sid = sid + 1
+                    except KeyError:
+                        print 'Woah, bad tags!'
+                        for k, v in id3info.items():
+                            print k, ":", v
         conn.close()
 

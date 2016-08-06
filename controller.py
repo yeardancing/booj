@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import operator, os, sys, socket, getopt
+import signal
 import cherrypy
 import json
 from booj.lib import template, player
@@ -42,8 +43,13 @@ def get_lan_ip():
 class Root(object):
 
     def __init__(self, db, player):
+        signal.signal(signal.SIGINT, self.signal_handler)
         self.db = db
         self.myplayer = player
+
+    def signal_handler(self, signal, frame):
+        self.myplayer.destroy()
+        sys.exit(0)
 
     @cherrypy.expose
     @template.output('index.html')
@@ -55,7 +61,7 @@ class Root(object):
                 message = self.actOnPlayNow(playnow)
             return json.dumps(message)
         isPlaying = self.myplayer.is_playing()
-        position = Position()
+        position = model.Position()
         if isPlaying:
             position = self.myplayer.query_position()
         #TODO: should pass Song object here
@@ -74,7 +80,7 @@ class Root(object):
                 message = self.actOnPlayNow(playnow)
             return json.dumps(message)
         isPlaying = self.myplayer.is_playing()
-        position = Position()
+        position = model.Position()
         if isPlaying:
             position = self.myplayer.query_position()
         #TODO: should pass Song object here
@@ -103,7 +109,7 @@ class Root(object):
                             'duration'  : int(duration) }
             return json.dumps(message)
         isPlaying = self.myplayer.is_playing()
-        position = Position()
+        position = model.Position()
         if isPlaying:
             position = self.myplayer.query_position()
         #TODO: should pass Song object here
