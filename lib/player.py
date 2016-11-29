@@ -55,7 +55,10 @@ class BoojPlayer:
             pos.maxTime = float(length)
         except ValueError:
             print "couldn't query position:" + length
-        pos.currentPosition = pos.currentTime / pos.maxTime 
+        if pos.maxTime != 0:
+            pos.currentPosition = pos.currentTime / pos.maxTime 
+        else:
+            pos.currentPosition = 0
         return pos
 
     def seek(self, position):

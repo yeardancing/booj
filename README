@@ -24,3 +24,11 @@ derek.spadaro@gmail.com
 
 Please don't write saying how crappy of a web app this is; it is my first
 one and I am an embedded systems person.
+
+Dependencies (Debian/Ubuntu):
+apt-get install gstreamer0.10-plugins-base
+apt-get install python-gst0.10
+apt-get install python-id3
+apt-get install python-cherrypy3
+apt-get install python-genshi
+git clone https://github.com/yeardancing/simpistreamer.git

@@ -10,8 +10,13 @@ class BoojDb():
         conn = sqlite3.connect(self.dbName)
         #conn.text_factory = str
         cur = conn.cursor()
-        cur.execute('SELECT DISTINCT artist, artistId FROM songs')
-        artists = cur.fetchall()
+        try:
+            cur.execute('SELECT DISTINCT artist, artistId FROM songs')
+            artists = cur.fetchall()
+        except sqlite3.OperationalError:
+            print "Error connecting to database."
+            artists = []
+
         conn.close()
         return artists
 
@@ -106,7 +111,7 @@ class BoojDb():
         for path, subdirs, files in os.walk(musicRoot):
             for filename in files:
                 f = os.path.join(path, filename)
-                if str(f).endswith('mp3'):
+                if str(f).endswith('.mp3'):
                     currfile = str(f)
                     try:
                         id3info = ID3(currfile)
