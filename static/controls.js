@@ -1,4 +1,17 @@
 
+function boojPageInit() {
+	if (typeof songInfo === "undefined") {
+		window.songInfo = {
+			title			: "none",
+            isplaying 		: "false",
+			duration 		: null
+		};
+	}
+
+    $('h1#currentsong').text(songInfo.title);
+	updatePlayButton(songInfo.isplaying);
+}
+
 function incrementSlider() {
     var currSliderVal = $('input#slider-0').slider("option", "value");
     if (currSliderVal == null)
@@ -42,14 +55,18 @@ $('.play').bind('click', function(event, ui) {
         if (data.playing)
         {
             updatePlayButton(data.playing);
+            songInfo.isplaying = data.playing;
         }
         if (data.artist && data.song)
         {
-            $('h1#currentsong').text(data.artist + ' - ' + data.song);
+            songInfo.title = data.artist + ' - ' + data.song;
+            $('h1#currentsong').text(songInfo.title);
+
         }
         if (data.duration)
         {
             // TODO
+            songInfo.duration = data.duration;
             console.log('setting max val to ' + data.duration);
             //$('input#slider-0').slider('option', 'max', data.duration);
             $('input#slider-0').attr('max', data.duration);
@@ -62,7 +79,7 @@ $('.play').bind('click', function(event, ui) {
 });
 
 $('button#playbutton.ctrls').bind('click', function(event, ui) {
-    if (nowplaying)
+    if (songInfo.isplaying)
     {
         var postdata = 'playnow=false';  // post the form values via ajax
     }
@@ -76,6 +93,7 @@ $('button#playbutton.ctrls').bind('click', function(event, ui) {
         {
             console.log('data.position: ' + data.position);
             updatePlayButton(data.playing);
+            songInfo.isplaying = data.playing;
         }
     });
     return true;

@@ -27,8 +27,16 @@ one and I am an embedded systems person.
 
 Dependencies (Debian/Ubuntu):
 apt-get install gstreamer0.10-plugins-base
+apt-get install ubuntu-restricted-extras
 apt-get install python-gst0.10
 apt-get install python-id3
 apt-get install python-cherrypy3
 apt-get install python-genshi
 git clone https://github.com/yeardancing/simpistreamer.git
+
+Bugs/Issues/Errata
+------------------
+* Passing in a music directory to startbooj.sh with spaces in the path does not work
+
+TODO: start song, go home.  slider and bottom controls are in wrong state.
+TODO: slider cannot be grabbed to seek (start with duration)
