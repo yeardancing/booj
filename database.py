@@ -77,7 +77,7 @@ class BoojDb():
 
     def validateTags(self, id3info):
         artist = title = album = genre = 'Unknown'
-        year = 0
+        year = 1970
         for k, v in id3info.items():
             if k == 'ARTIST':
                 artist = id3info['ARTIST']
@@ -89,7 +89,11 @@ class BoojDb():
                 genre = id3info['GENRE']
             elif k == 'YEAR':
                 year = id3info['YEAR']
-        return artist, title, album, genre, int(year)
+                try:
+                    year = int(year)
+                except ValueError:
+                    continue
+        return artist, title, album, genre, year
 
     def rebuildDatabase(self, musicRoot):
         conn = sqlite3.connect(self.dbName)
